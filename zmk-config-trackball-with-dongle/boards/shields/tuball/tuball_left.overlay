@@ -1,0 +1,31 @@
+#include "tuball.dtsi"
+#include "tuball-layouts.dtsi"
+
+/*
+ Complains about not having "input property in peripheral input splits, but also don't recognise <&trackball> if I assign one. Hmmm.
+ Maybe try pretending there's one? Since I can't quite delete it;
+ Or, move split input and listener stuffs into another .dtsi file.
+*/
+
+/ {
+	chosen {
+		zmk,kscan = &kscan0;
+	};
+
+	kscan0: kscan {
+		compatible = "zmk,kscan-gpio-matrix";
+		diode-direction = "col2row";		
+		col-gpios =
+			<&gpio0  9 (GPIO_ACTIVE_HIGH)>, // col_0_left P0.09
+			<&gpio0 10 (GPIO_ACTIVE_HIGH)>, // col_1_left P0.10
+			<&gpio1 11 (GPIO_ACTIVE_HIGH)>, // col_2_left P1.11
+			<&gpio1 13 (GPIO_ACTIVE_HIGH)>, // col_3_left P1.13
+			<&gpio1 15 (GPIO_ACTIVE_HIGH)>; // col_4_left P1.15
+		row-gpios =
+			<&gpio1  6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>, // row_0_left P1.06
+			<&gpio1  4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>, // row_1_left P1.04
+			<&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>, // row_2_left P0.11
+			<&gpio1  0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>; // row_3_left P1.00
+		wakeup-source;
+	};
+};

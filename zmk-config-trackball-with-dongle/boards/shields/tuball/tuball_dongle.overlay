@@ -1,0 +1,79 @@
+// Can't have the kscan0 here, that one's physical
+/* 
+    Central side is the only one that is aware of .keymap,
+    so put all input processors you want to take effect in input listener here.
+*/
+
+#include "tuball.dtsi"
+#include "split_input.dtsi"
+#include "tuball-layouts.dtsi"
+#include <input/processors.dtsi>
+#include <dt-bindings/zmk/input_transform.h>
+#include <behaviors/input_gestures_accel.dtsi>
+
+&physical_layout0 {
+    transform = <&default_transform>;
+};
+
+&pointer_accel { // this needs to be put BEFORE input-listener
+    input-type = <INPUT_EV_REL>;
+    codes = <INPUT_REL_X INPUT_REL_Y>;
+    sensitivity = <800>;         // 0.8x base sensitivity
+	min-factor = <800>;			  // 0.8x minimum for percision
+    max-factor = <3000>;          // 3.0x maximum acceleration
+    acceleration-exponent = <1>;  // Advanced exponential curve (1-5)
+    y-boost = <1100>;             // 1.1x Y-axis boost for widescreen
+    speed-threshold = <900>;      // Start acceleration at 900 counts/sec, just 1.5 inch/sec
+    speed-max = <1800>;           // Max acceleration at 1800 counts/sec, just 3 inch/sec
+    min-factor = <1000>;          // 1.0x minimum (no deceleration)
+	sensor-dpi = <600>;
+};
+
+/* More about input processors: https://zmk.dev/docs/keymaps/input-processors#input-processors-overview */
+
+&trackball_split_listener { // local trackball input split device child node, receiving events from the peripheral and raising them locally
+    status = "okay";
+    //input-processors = <&pointer_accel>;
+
+    /* layer-0 right left hand pointer */
+    /* This default layer should not have any additional transformations. 
+       All other layers will add to it, and then have all those extra steps removed
+       when returned to the base layer.
+    */
+
+    /* layer-1 left hand pointer */
+    left_hand_pointer: left_hand_pointer {
+        layers           = <1>;
+        input-processors = <
+            &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT) // Inverts the pointer direction
+	   // The regular scrolling assumes the scroling wheel, which is not used here, so &zip_scroll_transform is not applicable and does not work.
+	   // &zip_scroll_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT) // Inverts the pointer direction, from the default inversion..
+        >;
+	process-next; // To process the scroller layer, if/when it is activated. Without this command the processing would stop here.
+    };
+
+    /* layer-2 both hand scroll override */
+    either_hand_scroller: either_hand_scroller {
+        layers           = <2>;
+        input-processors = <
+            &zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT) // Inverts the pointer direction.
+            &zip_xy_scaler 1 15                              // Scales the scroll speed
+            &zip_xy_to_scroll_mapper                         // Converts XY movement to scroll events
+        >;
+    };
+
+};
+
+/ {
+    chosen {
+        zmk,kscan = &mock_kscan;
+        zmk,physical-layout = &physical_layout0;
+    };
+
+    mock_kscan: kscan_1 {
+        compatible = "zmk,kscan-mock";
+        columns = <0>;
+        rows = <0>;
+        events = <0>;
+    };
+};

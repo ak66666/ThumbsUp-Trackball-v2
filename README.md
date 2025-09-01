@@ -26,7 +26,8 @@ Other pictures in Photos folder.
 
 # Firmware
 
-In zmk-config-trackball folder
+In zmk-config-trackball folder - the original Bluetooth version.
+A version with a dongle - in zmk-config-trackball-with-dongle, a bit rough, but enough for now.
 
 
 //TODO:

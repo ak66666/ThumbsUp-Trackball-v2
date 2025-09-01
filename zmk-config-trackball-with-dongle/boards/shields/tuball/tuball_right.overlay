@@ -1,0 +1,37 @@
+#include "tuball.dtsi"
+#include "pmw3610.dtsi"
+#include "split_input.dtsi"
+#include "tuball-layouts.dtsi"
+#include <dt-bindings/zmk/input_transform.h>
+ 
+&spi0 {
+    status = "okay";
+};
+
+&trackball_split_input { // local trackball *split* input device child node
+	device = <&trackball>;
+};
+
+/ {
+	chosen {
+		zmk,kscan = &kscan0;
+	};
+        kscan0: kscan {
+            compatible = "zmk,kscan-gpio-direct";
+            wakeup-source;
+            input-gpios
+                = <&pro_micro 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                , <&pro_micro 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+                ;
+        };
+
+
+
+};
